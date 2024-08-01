@@ -1,17 +1,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-
 const char* ssid = "Astrocar";
 const char* password = "12345678";
-
 ESP8266WebServer server(80);
-
-// Define motor control pins
 const int motorPin1 = 5;  // D1 (GPIO 5)
 const int motorPin2 = 4;  // D2 (GPIO 4)
 const int motorPin3 = 0;  // D3 (GPIO 0)
 const int motorPin4 = 2;  // D4 (GPIO 2)
-
 const char html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html>
@@ -81,11 +76,9 @@ const char html[] PROGMEM = R"rawliteral(
 </body>
 </html>
 )rawliteral";
-
 void handleRoot() {
   server.send_P(200, "text/html", html);
 }
-
 void handleCommand() {
   if (server.hasArg("move")) {
     String move = server.arg("move");
@@ -94,7 +87,6 @@ void handleCommand() {
   }
   server.send(204); // No content to return
 }
-
 void controlCar(int command) {
   switch (command) {
     case 1: // Move up
@@ -129,27 +121,19 @@ void controlCar(int command) {
       break;
   }
 }
-
 void setup() {
   Serial.begin(115200);
   WiFi.softAP(ssid, password);
-
-  // Initialize motor control pins
   pinMode(motorPin1, OUTPUT);
   pinMode(motorPin2, OUTPUT);
   pinMode(motorPin3, OUTPUT);
   pinMode(motorPin4, OUTPUT);
-
-  // Stop motors initially
   controlCar(0);
-
   server.on("/", handleRoot);
   server.on("/command", handleCommand);
-
   server.begin();
   Serial.println("HTTP server started");
 }
-
 void loop() {
   server.handleClient();
 }
